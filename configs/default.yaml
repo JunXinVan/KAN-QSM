@@ -1,0 +1,49 @@
+# Minimal, stable defaults for Tri-plane 2.5D training (v0.9)
+l: 11          # number of stacked slices per plane (odd)
+patch: 96      # 3D patch size (P)
+stride: 64     # sliding-window stride
+epochs: 50
+
+# Data normalization: null | zscore | minmax
+normalize: zscore
+
+# Loss weights (QSMLoss)
+loss:
+  w_l1:   1.0
+  w_grad: 0.05
+  w_hfen: 0.10
+  w_freq: 0.05
+  w_ssim: 0.05
+  ssim_window: 11
+  ssim_sigma: 1.5
+  hfen_sigma: 1.0
+
+data:
+  train:
+    vols:  ["/abs/path/train/vol_001.npy", "..."]
+    masks: ["/abs/path/train/mask_001.npy", "..."]
+    chis:  ["/abs/path/train/chi_001.npy",  "..."]
+  val:
+    vols:  ["/abs/path/val/vol_101.npy", "..."]
+    masks: ["/abs/path/val/mask_101.npy", "..."]
+    chis:  ["/abs/path/val/chi_101.npy",  "..."]
+
+train:
+  epochs: 50
+  batch_size: 1
+  lr: 2.0e-4
+  weight_decay: 1.0e-4
+  amp: true
+  grad_accum: 1
+  save_every: 5
+  share_branch_weights: true
+
+tri_consistency:
+  enabled: true
+  weight: 0.02
+  mode: l1
+  start_epoch: 25   # 例如 epochs//2
+
+tta_lite:
+  enabled: true
+  candidates: [0.8, 1.0, 1.2]

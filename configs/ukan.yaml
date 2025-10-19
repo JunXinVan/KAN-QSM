@@ -1,0 +1,72 @@
+# UKAN training config (stable v1.0)
+# Replace the file paths below with your own .npy/.npz dataset paths.
+
+seed: 2025
+device: cuda
+out_dir: checkpoints_ukan
+
+# Tri-plane 2.5D core
+l: 11          # stacked slices per plane (odd)
+patch: 96      # cubic patch size
+stride: 64     # sliding-window stride
+normalize: zscore
+
+data:
+  train:
+    vols:  ["/path/to/train/vol_001.npy", "/path/to/train/vol_002.npy"]
+    masks: ["/path/to/train/mask_001.npy", "/path/to/train/mask_002.npy"]
+    chis:  ["/path/to/train/chi_001.npy",  "/path/to/train/chi_002.npy"]
+  val:
+    vols:  ["/path/to/val/vol_101.npy"]
+    masks: ["/path/to/val/mask_101.npy"]
+    chis:  ["/path/to/val/chi_101.npy"]
+
+# Training
+train:
+  epochs: 50
+  batch_size: 1
+  lr: 2.0e-4
+  weight_decay: 1.0e-4
+  amp: true
+  share_branch_weights: true
+  save_every: 5
+
+# Slice attention (inside UKAN2DBranch)
+csar_rank: 4
+csar_T: 1.0
+
+# UKAN constructor kwargs (passed to models/ukan_branch.py -> UKAN2DBranch)
+# If your local UKAN needs in_chans=3, input_channels=3, keep the defaults below.
+ukan:
+  num_classes: 1
+  in_chans: 3
+  input_channels: 3
+  img_size: 96
+  patch_size: 3
+  embed_dims: [64, 96, 160]
+  depths: [1, 1, 1]
+  # You can add extra keys required by your UKAN build, e.g. drop_path_rate, etc.
+
+# Composite loss
+loss:
+  w_l1:   1.0
+  w_grad: 0.05
+  w_hfen: 0.10
+  w_freq: 0.05
+  w_ssim: 0.05
+  ssim_window: 11
+  ssim_sigma: 1.5
+  hfen_sigma: 1.0
+
+# Tri-consistency among three embedded volumes (small weight; starts in 2nd half of training)
+tri_consistency:
+  enabled: true
+  weight: 0.02
+  mode: l1
+  # start_epoch defaults to epochs//2 if not provided
+  # start_epoch: 25
+
+# TTA-lite (temperature calibration on val set)
+tta_lite:
+  enabled: true
+  candidates: [0.8, 1.0, 1.2]

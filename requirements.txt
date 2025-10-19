@@ -1,0 +1,16 @@
+# ------------ Core ------------
+numpy>=1.22
+PyYAML>=6.0
+tqdm>=4.65
+
+# ------------ Optional but Recommended ------------
+matplotlib>=3.6     # tools/vis.py 的可视化
+nibabel>=5.0        # infer.py 的 NIfTI 读写（可选）
+
+# ------------ For UKAN external (common) ------------
+einops>=0.7.0
+# timm>=0.9.2      # 若你在 UKAN 源码中看到 timm 依赖，请取消本行注释
+
+# ------------ Install PyTorch separately ------------
+# 请到 https://pytorch.org 根据你的 CUDA 版本安装，如：
+# pip install --index-url https://download.pytorch.org/whl/cu121 torch torchvision torchaudio
